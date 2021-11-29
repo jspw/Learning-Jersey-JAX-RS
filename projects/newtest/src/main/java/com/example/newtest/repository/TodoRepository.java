@@ -29,6 +29,42 @@ public class TodoRepository {
         preparedStatement.executeUpdate();
     }
 
+    public void updateTodo (int id,Todo todoToUpdate) throws SQLException {
+
+        String sql = "update todos" +
+                " set summary=? , description=?" +
+                "where id=?";
+        preparedStatement = JdbcConnection.getConnection().prepareStatement(sql);
+        preparedStatement.setString(1, todoToUpdate.getSummary());
+        preparedStatement.setString(2, todoToUpdate.getDescription());
+        preparedStatement.setInt(3, id);
+
+        preparedStatement.executeUpdate();
+
+    }
+
+
+    public Todo getTodo(int id) throws SQLException {
+        Todo todo = new Todo();
+        String sql = "select * from todos where id=?";
+        preparedStatement = JdbcConnection.getConnection().prepareStatement(sql);
+        preparedStatement.setInt(1,id);
+        resultSet =   preparedStatement.executeQuery();
+            while (resultSet.next()){
+                todo.setId(resultSet.getInt(1));
+                todo.setSummary(resultSet.getString(2));
+                todo.setDescription(resultSet.getString(3));
+            }
+        return todo;
+    }
+
+    public void deleteTodo (int id) throws SQLException {
+        String sql = "delete from todos where id=?";
+        preparedStatement = JdbcConnection.getConnection().prepareStatement(sql);
+        preparedStatement.setInt(1,id);
+        preparedStatement.executeUpdate();
+    }
+
     public List<Todo> getAllTodos () throws SQLException {
         List<Todo> todos = new ArrayList<>();
         String sql = "SELECT * FROM todos";

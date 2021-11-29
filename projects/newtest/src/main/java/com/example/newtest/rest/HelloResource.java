@@ -15,5 +15,4 @@ public class HelloResource {
         return "Hello, World!";
     }
 
-
 }
