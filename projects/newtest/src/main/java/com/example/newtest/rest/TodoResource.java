@@ -5,12 +5,15 @@ import com.example.newtest.config.JdbcConnection;
 import com.example.newtest.model.Todo;
 import com.example.newtest.repository.TodoRepository;
 import com.example.newtest.service.TodoService;
+import com.example.newtest.utility.ExcelSheetGenerator;
+import com.example.newtest.utility.StaticData;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -60,8 +64,12 @@ public class TodoResource {
         System.out.println("Todo id : " + id);
         Todo todo = null;
         try {
-            todo = todoRepository.getTodo(id);
+            todo = todoService.getTodo(id);
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return todo;
@@ -120,13 +128,13 @@ public class TodoResource {
 
     @Path("/pdf")
     @GET
-    public static void generateTable ()  {
+    @Produces({MediaType.APPLICATION_JSON})
+    public  Response  generateTable ()  {
         Document my_report = new Document();
         try {
-
-              PdfWriter.getInstance(my_report,new FileOutputStream("/home/shifat/Documents/Jax-rs-Jersey/projects" +
-                     "/newtest" +
-                    "/data/" + "my_report" + new Date().getSeconds() + ".pdf"));
+              PdfWriter.getInstance(my_report,
+                      new FileOutputStream(StaticData.staticDir + "/pdfs/"+ "my_report" + new Date().getSeconds() +
+                              ".pdf"));
 
             my_report.open();
             PdfPTable report_table = new PdfPTable(3);
@@ -137,7 +145,7 @@ public class TodoResource {
             ResultSet resultSet =   preparedStatement.executeQuery();
 
             while (resultSet.next()){
-                System.out.println(resultSet.getString("id"));
+
                 String id = resultSet.getString("id");
                 table_cell = new PdfPCell(new Phrase(id));
                 report_table.addCell(table_cell);
@@ -157,14 +165,41 @@ public class TodoResource {
             my_report.close();
 
             resultSet.close();
+            return Response.status(Response.Status.CREATED).entity( "Pdf report generated at : " +  StaticData.staticDir + "/pdfs/").build();
         } catch (DocumentException e) {
             e.printStackTrace();
+            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(throwables.getMessage()).build();
         }
 
+    }
+
+    @Path("/sheet")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response generateSheet() {
+        try {
+            ResultSet result = todoRepository.getTodos();
+            ExcelSheetGenerator.generate(result);
+            return Response.status(Response.Status.CREATED).entity( "Excel sheet generated in : " +  ExcelSheetGenerator.excelSheetDir).build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
+        }
 
     }
 

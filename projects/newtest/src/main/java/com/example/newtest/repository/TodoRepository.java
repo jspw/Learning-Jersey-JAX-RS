@@ -1,10 +1,8 @@
 package com.example.newtest.repository;
 
-import com.example.newtest.config.DbManager;
 import com.example.newtest.config.JdbcConnection;
 import com.example.newtest.model.Todo;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,18 +42,18 @@ public class TodoRepository {
     }
 
 
-    public Todo getTodo(int id) throws SQLException {
-        Todo todo = new Todo();
+    public ResultSet getTodo(int id) throws SQLException {
         String sql = "select * from todos where id=?";
         preparedStatement = JdbcConnection.getConnection().prepareStatement(sql);
         preparedStatement.setInt(1,id);
         resultSet =   preparedStatement.executeQuery();
-            while (resultSet.next()){
-                todo.setId(resultSet.getInt(1));
-                todo.setSummary(resultSet.getString(2));
-                todo.setDescription(resultSet.getString(3));
-            }
-        return todo;
+//            while (resultSet.next()){
+//                todo.setId(resultSet.getInt(1));
+//                todo.setSummary(resultSet.getString(2));
+//                todo.setDescription(resultSet.getString(3));
+//
+//            }
+        return resultSet;
     }
 
     public void deleteTodo (int id) throws SQLException {
@@ -79,5 +77,13 @@ public class TodoRepository {
         }
 
         return  todos;
+    }
+
+    public ResultSet getTodos () throws SQLException {
+        List<Todo> todos = new ArrayList<>();
+        String sql = "SELECT * FROM todos";
+        preparedStatement = JdbcConnection.getConnection().prepareStatement(sql);
+        resultSet =  preparedStatement.executeQuery();
+        return  resultSet;
     }
 }

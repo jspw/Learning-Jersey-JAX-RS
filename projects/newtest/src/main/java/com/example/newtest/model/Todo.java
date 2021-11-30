@@ -2,36 +2,32 @@ package com.example.newtest.model;
 
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
 
 
 @XmlRootElement
 public class Todo {
-    private int id;
+    private long id;
     private String summary;
     private String description;
+    private Date reg_date;
 
-    public Todo(int id, String summary, String description) {
+    public Todo() {
+
+    }
+
+    public Todo(long id, String summary, String description, Date reg_date) {
         this.id = id;
         this.summary = summary;
         this.description = description;
+        this.reg_date = reg_date;
     }
 
-    public  Todo (){}
-
-    @Override
-    public String toString() {
-        return "Todo{" +
-                "id=" + id +
-                ", summary='" + summary + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
-
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -49,5 +45,23 @@ public class Todo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getReg_date() {
+        return reg_date;
+    }
+
+    public void setReg_date(Date reg_date) {
+        this.reg_date = reg_date;
+    }
+
+    @Override
+    public String toString() {
+        return "Todo{" +
+                "id=" + id +
+                ", summary='" + summary + '\'' +
+                ", description='" + description + '\'' +
+                ", reg_date=" + reg_date +
+                '}';
     }
 }
