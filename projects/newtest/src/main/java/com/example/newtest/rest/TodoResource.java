@@ -65,11 +65,7 @@ public class TodoResource {
         Todo todo = null;
         try {
             todo = todoService.getTodo(id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (SQLException | NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return todo;
@@ -108,7 +104,7 @@ public class TodoResource {
         try {
             todoRepository.updateTodo(id,todo);
             return Response.status(Response.Status.CREATED).entity(todo).build();
-        }catch (SQLException throwables) {
+        }catch (SQLException | NoSuchFieldException | IllegalAccessException throwables) {
             throwables.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).entity(throwables.getMessage()).build();
         }
@@ -166,15 +162,9 @@ public class TodoResource {
 
             resultSet.close();
             return Response.status(Response.Status.CREATED).entity( "Pdf report generated at : " +  StaticData.staticDir + "/pdfs/").build();
-        } catch (DocumentException e) {
+        } catch (DocumentException | FileNotFoundException | SQLException e) {
             e.printStackTrace();
             return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(throwables.getMessage()).build();
         }
 
     }
@@ -187,16 +177,7 @@ public class TodoResource {
             ResultSet result = todoRepository.getTodos();
             ExcelSheetGenerator.generate(result);
             return Response.status(Response.Status.CREATED).entity( "Excel sheet generated in : " +  ExcelSheetGenerator.excelSheetDir).build();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
-        } catch (IllegalAccessException e) {
+        } catch (SQLException | NoSuchFieldException | IOException | IllegalAccessException e) {
             e.printStackTrace();
             return  Response.status(Response.Status.EXPECTATION_FAILED).entity(e.getMessage()).build();
         }

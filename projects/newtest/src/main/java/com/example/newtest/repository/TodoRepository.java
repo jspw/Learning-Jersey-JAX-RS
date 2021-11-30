@@ -2,6 +2,7 @@ package com.example.newtest.repository;
 
 import com.example.newtest.config.JdbcConnection;
 import com.example.newtest.model.Todo;
+import com.example.newtest.model.mapper.ResultSetToTodo;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,14 +28,19 @@ public class TodoRepository {
         preparedStatement.executeUpdate();
     }
 
-    public void updateTodo (int id,Todo todoToUpdate) throws SQLException {
+    public void updateTodo (int id,Todo todoToUpdate) throws SQLException, NoSuchFieldException, IllegalAccessException {
+
+        Todo todo = ResultSetToTodo.todoModel(getTodo(id));
+
+        System.out.println(todoToUpdate);
 
         String sql = "update todos" +
                 " set summary=? , description=?" +
                 "where id=?";
         preparedStatement = JdbcConnection.getConnection().prepareStatement(sql);
-        preparedStatement.setString(1, todoToUpdate.getSummary());
-        preparedStatement.setString(2, todoToUpdate.getDescription());
+        preparedStatement.setString(1, todoToUpdate.getSummary() == null ? todo.getSummary() : todoToUpdate.getSummary() );
+        preparedStatement.setString(2, todoToUpdate.getDescription() == null ? todo.getDescription() :
+                todoToUpdate.getDescription());
         preparedStatement.setInt(3, id);
 
         preparedStatement.executeUpdate();
